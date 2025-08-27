@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-otel-app
+  labels:
+    app: python-otel-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-otel-app
+  template:
+    metadata:
+      labels:
+        app: python-otel-app
+    spec:
+      containers:
+      - name: python-otel-app
+        image: your-registry/python-otel-app:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: SW_AGENT_NAME
+          value: python-otel-app
+        - name: SW_AGENT_COLLECTOR_BACKEND_SERVICES
+          value: skywalking-skywalking-helm-oap.default.svc.cluster.local:11800
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-otel-app
+  labels:
+    app: python-otel-app
+spec:
+  selector:
+    app: python-otel-app
+  ports:
+  - port: 5000
+    targetPort: 5000
+  type: ClusterIP
